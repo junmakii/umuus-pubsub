@@ -28,7 +28,7 @@ setup(
  'addict>=2.2.0',
  'fire>=0.1.3',
  'redis>=3.0.1',
- 'toolz==0.9.0'],
+ 'toolz>=0.9.0'],
     dependency_links=[],
     classifiers=[],
     entry_points={'console_scripts': ['umuus_pubsub = umuus_pubsub:main'], 'gui_scripts': []},
