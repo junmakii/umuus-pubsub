@@ -1,0 +1,4 @@
+apiVersion: v1
+description: "A simple Pub/Sub utility for Python."
+name: umuus_pubsub
+version: 0.1
