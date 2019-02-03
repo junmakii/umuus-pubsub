@@ -128,6 +128,7 @@ __install_requires__ = [
     'addict>=2.2.0',
     'fire>=0.1.3',
     'redis>=3.0.1',
+    'toolz==0.9.0',
 ]
 __dependency_links__ = []
 __classifiers__ = []
