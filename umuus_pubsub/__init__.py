@@ -69,6 +69,14 @@ Example
 
 ----
 
+    async def f():
+        async for message in default.subscribe('*').async_gen():
+            print(message)
+
+    asyncio.run(f())
+
+----
+
 Authors
 -------
 
@@ -106,6 +114,7 @@ import redis
 import fire
 import attr
 import addict
+import asyncio
 __version__ = '0.1'
 __url__ = 'https://github.com/junmakii/umuus-pubsub'
 __author__ = 'Jun Makii'
@@ -156,6 +165,9 @@ class Redis(object):
         self.shared_state.is_running = True
         return self
 
+    def is_running(self):
+        return self.shared_state.is_running
+
     def subscribe(self, patterns=[], handlers={}):
         self = copy.copy(self)
         self.queue = []
@@ -166,9 +178,6 @@ class Redis(object):
         handlers and self.pubsub.psubscribe(**handlers)
         threading.Thread(target=self.loop).start()
         return self
-
-    def exit(self):
-        self.shared_state.is_running = False
 
     @toolz.curry
     def register(self, fn, channel=None):
@@ -209,16 +218,25 @@ class Redis(object):
         return self
 
     def wait(self):
-        while self.shared_state.is_running and not self.queue:
+        while self.is_running() and not self.queue:
             time.sleep(0.1)
         return self.serialize(self.queue.pop()['data'])
 
     def gen(self):
-        while self.shared_state.is_running:
+        while self.is_running():
             yield self.wait()
 
+    async def async_wait(self):
+        while self.is_running() and not self.queue:
+            await asyncio.sleep(0.1)
+        return self.serialize(self.queue.pop()['data'])
+
+    async def async_gen(self):
+        while self.is_running():
+            yield await self.async_wait()
+
     def loop(self):
-        while self.shared_state.is_running:
+        while self.is_running():
             message = self.pubsub.get_message(ignore_subscribe_messages=True)
             if message and message['type'] in ['pmessage']:
                 self.queue.insert(0, message)

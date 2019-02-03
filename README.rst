@@ -50,6 +50,14 @@ Example
 
 ----
 
+    async def f():
+        async for message in default.subscribe('*').async_gen():
+            print(message)
+
+    asyncio.run(f())
+
+----
+
 Authors
 -------
 
